@@ -583,32 +583,47 @@ canvas:active {
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+    }
     .header {
         flex-direction: column;
         align-items: flex-start;
-        padding: 12px 16px;
+        padding: 12px;
     }
     .header-controls {
         width: 100%;
-        margin-top: 12px;
+        margin-top: 8px;
         justify-content: space-between;
     }
     
     .info-panel {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .info-item span {
+        display: none; /* Hide labels to save space */
+    }
+    .info-item strong {
+        font-size: 0.9rem;
     }
     
     .toolbar {
         flex-direction: column;
-        gap: 12px;
-        align-items: flex-start;
+        gap: 8px;
+        padding: 8px 12px;
     }
     
     .toolbar-section {
         width: 100%;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        scrollbar-width: none; /* Firefox */
+    }
+    .toolbar-section::-webkit-scrollbar {
+        display: none; /* Chrome */
     }
     
     .toolbar-section.flex-right {
@@ -618,27 +633,37 @@ canvas:active {
         margin-left: 0;
     }
     
-    .btn {
-        padding: 10px 16px; /* Larger touch targets */
-        font-size: 0.9rem;
-        flex: 1; /* Make buttons expand on mobile */
-        text-align: center;
+    .lead-toggle {
+        flex: 0 0 auto;
+        padding: 6px 12px;
     }
     
     input[type="range"] {
-        width: 100%; /* Sliders take full width */
+        width: 100px;
     }
     
-    .ai-modal-content {
-        width: 95vw; /* Make modals take up screen */
-        max-height: 90vh;
+    /* Sticky AI Buttons */
+    #askAIBtn, #askGPTBtn {
+        position: fixed;
+        bottom: 16px;
+        z-index: 999;
+        width: calc(50% - 20px);
+        padding: 14px;
+        font-size: 1rem;
+        font-weight: 700;
+        border-radius: 30px;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    }
+    #askAIBtn { left: 12px; }
+    #askGPTBtn { right: 12px; }
+    
+    /* Ensure scroll container has bottom padding to avoid hiding behind buttons */
+    .scroll-container {
+        padding-bottom: 80px;
     }
     
-    .modal-content {
+    .ai-modal-content, .modal-content {
         width: 95vw;
-    }
-    
-    .lead-toggle {
-        padding: 8px 12px;
+        max-height: 90vh;
     }
 }
