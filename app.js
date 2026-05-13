@@ -70,27 +70,37 @@ const leadToggles = document.querySelectorAll('.lead-toggle input');
 // Settings & AI DOM
 const settingsBtn = document.getElementById('settingsBtn');
 const askAIBtn = document.getElementById('askAIBtn');
+const askGPTBtn = document.getElementById('askGPTBtn');
 const settingsModal = document.getElementById('settingsModal');
 const aiModal = document.getElementById('aiModal');
 const closeSettingsBtn = document.getElementById('closeSettingsBtn');
 const closeAiBtn = document.getElementById('closeAiBtn');
 const geminiKeyInput = document.getElementById('geminiKeyInput');
+const openaiKeyInput = document.getElementById('openaiKeyInput');
 const saveKeyBtn = document.getElementById('saveKeyBtn');
 const aiLoading = document.getElementById('aiLoading');
+const aiLoadingText = document.getElementById('aiLoadingText');
 const aiMarkdown = document.getElementById('aiMarkdown');
+const aiModalTitle = document.getElementById('aiModalTitle');
 
 // Settings Logic
-const savedKey = localStorage.getItem('geminiApiKey');
-if (savedKey) geminiKeyInput.value = savedKey;
+const savedGeminiKey = localStorage.getItem('geminiApiKey');
+if (savedGeminiKey) geminiKeyInput.value = savedGeminiKey;
+
+const savedOpenAiKey = localStorage.getItem('openaiApiKey');
+if (savedOpenAiKey) openaiKeyInput.value = savedOpenAiKey;
 
 settingsBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
 closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
 saveKeyBtn.addEventListener('click', () => {
     localStorage.setItem('geminiApiKey', geminiKeyInput.value.trim());
+    localStorage.setItem('openaiApiKey', openaiKeyInput.value.trim());
     settingsModal.classList.add('hidden');
 });
 
 // Gemini AI Logic
+const promptKorean = "You are an expert cardiologist. Analyze this 6-lead ECG image. The leads shown from top to bottom are what the user selected. The grid is standard 10mm/mV and 25mm/s. Identify any arrhythmias, morphological abnormalities (like ST elevation, T wave inversion), or signs of ischemia. **답변은 반드시 한국어로 작성하고, 의학 용어를 적절히 섞어 전문적인 심장내과 소견서 형태로 출력해 줘.**";
+
 askAIBtn.addEventListener('click', async () => {
     const apiKey = localStorage.getItem('geminiApiKey');
     if (!apiKey) {
@@ -99,9 +109,9 @@ askAIBtn.addEventListener('click', async () => {
         return;
     }
     
-    // Grab the current visible canvas as JPEG
     const base64Image = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
-    
+    aiModalTitle.innerHTML = '✨ Gemini AI EKG Analysis';
+    aiLoadingText.textContent = 'Gemini is analyzing the visible EKG window...';
     aiModal.classList.remove('hidden');
     aiLoading.classList.remove('hidden');
     aiMarkdown.innerHTML = '';
@@ -113,7 +123,7 @@ askAIBtn.addEventListener('click', async () => {
             body: JSON.stringify({
                 contents: [{
                     parts: [
-                        { text: "You are an expert cardiologist. Analyze this 6-lead ECG image. The leads shown from top to bottom are what the user selected. The grid is standard 10mm/mV and 25mm/s. Identify any arrhythmias, morphological abnormalities (like ST elevation, T wave inversion), or signs of ischemia. Provide a structured clinical report in Markdown format." },
+                        { text: promptKorean },
                         { inline_data: { mime_type: "image/jpeg", data: base64Image } }
                     ]
                 }]
@@ -132,6 +142,58 @@ askAIBtn.addEventListener('click', async () => {
         aiMarkdown.innerHTML = `<p style="color: red; font-weight: bold;">Error analyzing EKG: ${e.message}</p>`;
     }
 });
+
+// OpenAI GPT Logic
+askGPTBtn.addEventListener('click', async () => {
+    const apiKey = localStorage.getItem('openaiApiKey');
+    if (!apiKey) {
+        alert("Please enter your OpenAI API Key in Settings first.");
+        settingsModal.classList.remove('hidden');
+        return;
+    }
+    
+    const base64Image = canvas.toDataURL('image/jpeg', 0.9).split(',')[1];
+    aiModalTitle.innerHTML = '🧠 GPT-4o EKG Analysis';
+    aiLoadingText.textContent = 'GPT-4o is analyzing the visible EKG window...';
+    aiModal.classList.remove('hidden');
+    aiLoading.classList.remove('hidden');
+    aiMarkdown.innerHTML = '';
+    
+    try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: "gpt-4o",
+                messages: [
+                    {
+                        role: "user",
+                        content: [
+                            { type: "text", text: promptKorean },
+                            { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
+                        ]
+                    }
+                ],
+                max_tokens: 1500
+            })
+        });
+        
+        const data = await response.json();
+        if (data.error) throw new Error(data.error.message);
+        
+        const text = data.choices[0].message.content;
+        aiLoading.classList.add('hidden');
+        aiMarkdown.innerHTML = marked.parse(text);
+        
+    } catch (e) {
+        aiLoading.classList.add('hidden');
+        aiMarkdown.innerHTML = `<p style="color: red; font-weight: bold;">Error analyzing EKG: ${e.message}</p>`;
+    }
+});
+
 closeAiBtn.addEventListener('click', () => aiModal.classList.add('hidden'));
 
 // Drag and Drop
@@ -283,6 +345,7 @@ function handleFile(file) {
             reportContainer.classList.remove('hidden');
             printBtn.disabled = false;
             askAIBtn.disabled = false;
+            askGPTBtn.disabled = false;
             
             runArrhythmiaScan();
             

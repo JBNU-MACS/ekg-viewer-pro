@@ -106,7 +106,10 @@
                             <span class="hr-label">BPM (Visible Window)</span>
                         </div>
                         <button id="askAIBtn" class="btn btn-primary btn-sm" disabled>
-                            ✨ Ask AI (Gemini)
+                            ✨ Ask Gemini
+                        </button>
+                        <button id="askGPTBtn" class="btn btn-primary btn-sm" style="background-color: #10a37f; border-color: #10a37f;" disabled>
+                            🧠 Ask GPT
                         </button>
                     </div>
                     <div class="toolbar-section flex-right">
@@ -146,16 +149,20 @@
     <div id="settingsModal" class="modal-overlay hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>⚙️ Gemini API Settings</h3>
+                <h3>⚙️ AI API Settings</h3>
                 <button class="close-btn" id="closeSettingsBtn">&times;</button>
             </div>
             <div class="modal-body">
-                <p>Enter your Google Gemini API Key to enable AI-powered EKG analysis.</p>
+                <p><strong>Google Gemini API Key</strong></p>
                 <input type="password" id="geminiKeyInput" placeholder="AIzaSy..." class="full-width-input" />
-                <p class="modal-hint">Your key is saved locally in your browser and never sent to our servers.</p>
+                
+                <p style="margin-top: 16px;"><strong>OpenAI API Key (GPT-4o)</strong></p>
+                <input type="password" id="openaiKeyInput" placeholder="sk-..." class="full-width-input" />
+                
+                <p class="modal-hint" style="margin-top: 12px;">Keys are saved locally in your browser and never sent to our servers.</p>
             </div>
             <div class="modal-footer">
-                <button id="saveKeyBtn" class="btn btn-primary">Save Key</button>
+                <button id="saveKeyBtn" class="btn btn-primary">Save Keys</button>
             </div>
         </div>
     </div>
@@ -163,13 +170,13 @@
     <div id="aiModal" class="modal-overlay hidden">
         <div class="modal-content ai-modal-content">
             <div class="modal-header">
-                <h3>✨ Gemini AI EKG Analysis</h3>
+                <h3 id="aiModalTitle">✨ AI EKG Analysis</h3>
                 <button class="close-btn" id="closeAiBtn">&times;</button>
             </div>
             <div class="modal-body" id="aiReportContent">
                 <div class="loading-state hidden" id="aiLoading">
                     <div class="spinner"></div>
-                    <p>Gemini is analyzing the visible EKG window...</p>
+                    <p id="aiLoadingText">AI is analyzing the visible EKG window...</p>
                 </div>
                 <div class="markdown-body" id="aiMarkdown"></div>
             </div>
