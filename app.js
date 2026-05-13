@@ -54,6 +54,20 @@ const ctx = canvas.getContext('2d', { alpha: false });
 const scrollContainer = document.getElementById('scrollContainer');
 const virtualContent = document.getElementById('virtualContent');
 
+const toggleToolsBtn = document.getElementById('toggleToolsBtn');
+const toolsContainer = document.getElementById('toolsContainer');
+
+if (toggleToolsBtn && toolsContainer) {
+    toggleToolsBtn.addEventListener('click', () => {
+        toolsContainer.classList.toggle('collapsed');
+        if (toolsContainer.classList.contains('collapsed')) {
+            toggleToolsBtn.innerHTML = '⚙️ Show Tools & Info';
+        } else {
+            toggleToolsBtn.innerHTML = '⚙️ Hide Tools & Info';
+        }
+    });
+}
+
 const gainSlider = document.getElementById('gainSlider');
 const gainValue = document.getElementById('gainValue');
 const zoomSlider = document.getElementById('zoomSlider');
