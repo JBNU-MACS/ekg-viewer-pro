@@ -53,17 +53,18 @@ const canvas = document.getElementById('ekgCanvas');
 const ctx = canvas.getContext('2d', { alpha: false });
 const scrollContainer = document.getElementById('scrollContainer');
 const virtualContent = document.getElementById('virtualContent');
-
 const toggleToolsBtn = document.getElementById('toggleToolsBtn');
 const toolsContainer = document.getElementById('toolsContainer');
 
 if (toggleToolsBtn && toolsContainer) {
     toggleToolsBtn.addEventListener('click', () => {
         toolsContainer.classList.toggle('collapsed');
-        if (toolsContainer.classList.contains('collapsed')) {
-            toggleToolsBtn.innerHTML = '⚙️ Show Tools & Info';
-        } else {
-            toggleToolsBtn.innerHTML = '⚙️ Hide Tools & Info';
+    });
+    
+    // Close bottom sheet when clicking on the canvas
+    canvas.addEventListener('click', () => {
+        if (!toolsContainer.classList.contains('collapsed') && window.innerWidth <= 768) {
+            toolsContainer.classList.add('collapsed');
         }
     });
 }

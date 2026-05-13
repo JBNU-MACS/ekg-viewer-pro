@@ -581,117 +581,107 @@ canvas:active {
     font-weight: 700;
 }
 
-/* Mobile Responsiveness */
-.mobile-nav-header {
-    display: none;
-}
+/* V10 Premium Mobile Overrides */
+.mobile-only { display: none !important; }
+.hidden-mobile { display: inline-flex !important; }
+
 .persistent-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 16px;
-    background: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 24px; background: #ffffff; border-bottom: 1px solid #e2e8f0;
 }
+.hr-value { font-weight: bold; font-size: 1.2rem; color: #ef4444; }
+.hr-label { font-size: 0.85rem; color: #64748b; font-weight: 500; margin-left: 6px; }
+.pill-btn { border-radius: 9999px; font-weight: 600; padding: 10px 20px; border: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
+.pill-btn:active { transform: scale(0.95); }
+.ai-gemini { background: linear-gradient(135deg, #4f46e5, #3b82f6); color: white; }
+.ai-gpt { background: linear-gradient(135deg, #10a37f, #0d8a6a); color: white; }
 
 @media (max-width: 768px) {
-    body {
-        overflow-x: hidden;
+    body { overflow-x: hidden; background: #f8fafc; }
+    .mobile-only { display: flex !important; }
+    .hidden-mobile { display: none !important; }
+    
+    .content-area { padding: 0 !important; }
+    .report-container { border-radius: 0; box-shadow: none; border: none; margin: 0; padding: 0; }
+    
+    /* Top Nav Glassmorphism */
+    .top-nav.glass-nav {
+        position: fixed; top: 0; left: 0; width: 100%;
+        background: rgba(255, 255, 255, 0.7) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        z-index: 1000;
+        padding: 12px 16px;
     }
     
-    .mobile-nav-header {
-        display: block;
-        padding: 8px 12px;
-        background: #f8fafc;
-        border-bottom: 1px solid #e2e8f0;
+    /* Immersive Canvas */
+    .scroll-container {
+        margin-top: 60px; /* Space for top nav */
+        height: calc(100vh - 130px); /* Space for nav and dock */
+        padding-bottom: 0 !important;
+        background: #fff;
     }
     
-    .persistent-toolbar {
+    /* Bottom Dock Glassmorphism */
+    .persistent-toolbar.glass-dock {
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        background: rgba(255, 255, 255, 0.8) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(0,0,0,0.05);
+        border-bottom: none;
+        z-index: 998;
+        padding: 12px 16px;
+        padding-bottom: max(16px, env(safe-area-inset-bottom));
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.04);
         display: flex !important;
     }
+    .ai-actions { display: flex; gap: 8px; flex: 1; justify-content: flex-end; }
+    .pill-btn { padding: 10px 16px; font-size: 0.95rem; }
     
-    .tools-container.collapsed {
-        display: none;
-    }
-    
-    .header {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 12px;
-    }
-    .header-controls {
-        width: 100%;
-        margin-top: 8px;
-        justify-content: space-between;
-    }
-    
-    .info-panel {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    .info-item span {
-        display: none; /* Hide labels to save space */
-    }
-    .info-item strong {
-        font-size: 0.9rem;
-    }
-    
-    .toolbar {
-        flex-direction: column;
-        gap: 8px;
-        padding: 8px 12px;
-    }
-    
-    .toolbar-section {
-        width: 100%;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        padding-bottom: 4px;
-        scrollbar-width: none; /* Firefox */
-    }
-    .toolbar-section::-webkit-scrollbar {
-        display: none; /* Chrome */
-    }
-    
-    .toolbar-section.flex-right {
-        justify-content: flex-start;
-        border-left: none;
-        padding-left: 0;
-        margin-left: 0;
-    }
-    
-    .lead-toggle {
-        flex: 0 0 auto;
-        padding: 6px 12px;
-    }
-    
-    input[type="range"] {
-        width: 100px;
-    }
-    
-    /* Sticky AI Buttons */
-    #askAIBtn, #askGPTBtn {
+    /* Bottom Sheet Tools (replaces inline toolbars) */
+    .bottom-sheet {
         position: fixed;
-        bottom: 16px;
-        z-index: 999;
-        width: calc(50% - 20px);
-        padding: 14px;
-        font-size: 1rem;
-        font-weight: 700;
-        border-radius: 30px;
-        box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+        bottom: 0; left: 0; width: 100%;
+        background: #ffffff;
+        border-radius: 24px 24px 0 0;
+        padding: 16px 16px 40px 16px;
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+        z-index: 2000;
+        transform: translateY(0);
+        transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+        display: block !important;
+        max-height: 85vh;
+        overflow-y: auto;
     }
-    #askAIBtn { left: 12px; }
-    #askGPTBtn { right: 12px; }
+    .bottom-sheet.collapsed {
+        transform: translateY(110%);
+        box-shadow: none;
+    }
+    .bottom-sheet-drag-handle {
+        width: 36px; height: 5px; background: #cbd5e1; border-radius: 3px; margin: 0 auto 16px auto;
+    }
     
-    /* Ensure scroll container has bottom padding to avoid hiding behind buttons */
-    .scroll-container {
-        padding-bottom: 80px;
+    /* Format internals of bottom sheet */
+    .patient-header { flex-direction: row; flex-wrap: wrap; gap: 8px; padding: 0 0 16px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 16px; }
+    .info-group { flex: 1 1 40%; }
+    .info-group .label { font-size: 0.75rem; }
+    
+    .toolbar-section { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+    .toolbar-section::-webkit-scrollbar { display: none; }
+    
+    /* Modern segmented chips for leads */
+    .lead-toggles { gap: 8px; display: flex; flex-wrap: nowrap; }
+    .lead-toggle {
+        background: #f1f5f9; border-radius: 100px; padding: 8px 20px; border: none; font-weight: 600; white-space: nowrap; flex: 0 0 auto;
     }
+    .lead-toggle:has(input:checked) { background: #2563eb; color: white; }
+    .lead-toggle input { display: none; }
     
     .ai-modal-content, .modal-content {
         width: 95vw;
         max-height: 90vh;
+        border-radius: 20px;
     }
 }
