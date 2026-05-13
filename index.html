@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical EKG Viewer V3</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navigation / Header -->
+        <header class="top-nav no-print">
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
+                <span>EKG Viewer Pro</span>
+            </div>
+            <div class="controls">
+                <button class="btn btn-secondary btn-icon" id="settingsBtn" title="API Settings">
+                    ⚙️ Settings
+                </button>
+                <label class="btn btn-primary file-upload">
+                    <input type="file" id="fileInput" accept=".rpd" />
+                    <span>Upload .rpd File</span>
+                </label>
+                <button class="btn btn-secondary" id="printBtn" disabled>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                    Print
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="content-area">
+            <div class="upload-placeholder" id="uploadPlaceholder">
+                <div class="upload-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                </div>
+                <h2>Drag & Drop your .rpd file here</h2>
+                <p>Or click the upload button in the top right.</p>
+            </div>
+
+            <div class="report-container hidden" id="reportContainer">
+                <!-- Patient Info Header -->
+                <div class="patient-header">
+                    <div class="info-group">
+                        <span class="label">Patient Name</span>
+                        <span class="value" id="infoName">---</span>
+                    </div>
+                    <div class="info-group">
+                        <span class="label">Age / Gender</span>
+                        <span class="value" id="infoAgeGender">---</span>
+                    </div>
+                    <div class="info-group">
+                        <span class="label">Record Date</span>
+                        <span class="value" id="infoDate">---</span>
+                    </div>
+                    <div class="info-group">
+                        <span class="label">Device</span>
+                        <span class="value" id="infoDevice">---</span>
+                    </div>
+                    <div class="info-group">
+                        <span class="label">Arrhythmia Scan</span>
+                        <span class="value status-badge" id="scanStatus">Scanning...</span>
+                    </div>
+                </div>
+
+                <!-- Secondary Toolbar: Leads & Tools -->
+                <div class="ekg-toolbar no-print">
+                    <div class="toolbar-section">
+                        <span class="toolbar-label">Active Leads:</span>
+                        <div class="lead-toggles" id="leadToggles">
+                            <label class="lead-toggle"><input type="checkbox" value="Lead I" checked> <span>I</span></label>
+                            <label class="lead-toggle"><input type="checkbox" value="Lead II" checked> <span>II</span></label>
+                            <label class="lead-toggle"><input type="checkbox" value="Lead III" checked> <span>III</span></label>
+                            <label class="lead-toggle"><input type="checkbox" value="aVR" checked> <span>aVR</span></label>
+                            <label class="lead-toggle"><input type="checkbox" value="aVL" checked> <span>aVL</span></label>
+                            <label class="lead-toggle"><input type="checkbox" value="aVF" checked> <span>aVF</span></label>
+                        </div>
+                    </div>
+                    <div class="toolbar-section flex-right">
+                        <div class="tool-group">
+                            <label>Zoom (Grid):</label>
+                            <input type="range" id="zoomSlider" min="0.5" max="3" step="0.1" value="1" />
+                            <span id="zoomValue" class="slider-val">10px/mm</span>
+                        </div>
+                        <div class="tool-group">
+                            <label>Gain (mV):</label>
+                            <input type="range" id="gainSlider" min="0.1" max="10" step="0.1" value="1" />
+                            <span id="gainValue" class="slider-val">1.0x</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Third Toolbar: Navigation & HR -->
+                <div class="ekg-toolbar no-print bottom-border">
+                    <div class="toolbar-section">
+                        <div class="dynamic-hr">
+                            <span class="hr-icon">❤️</span>
+                            <span id="visibleHR" class="hr-value">---</span>
+                            <span class="hr-label">BPM (Visible Window)</span>
+                        </div>
+                        <button id="askAIBtn" class="btn btn-primary btn-sm" disabled>
+                            ✨ Ask AI (Gemini)
+                        </button>
+                    </div>
+                    <div class="toolbar-section flex-right">
+                        <div class="tool-group">
+                            <label>Jump to Event:</label>
+                            <select id="eventsDropdown">
+                                <option value="-1">No events found</option>
+                            </select>
+                            <div class="event-nav-btns">
+                                <button id="prevEventBtn" class="btn btn-secondary btn-sm" disabled>< Prev</button>
+                                <button id="nextEventBtn" class="btn btn-secondary btn-sm" disabled>Next ></button>
+                            </div>
+                        </div>
+                        <div class="tool-group jump-box">
+                            <label>Jump to Time (HH:MM:SS):</label>
+                            <input type="time" step="1" id="jumpInput" />
+                            <button id="jumpBtn" class="btn btn-secondary btn-sm">Go</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canvas Area -->
+                <div class="canvas-wrapper scroll-container" id="scrollContainer">
+                    <div class="virtual-content" id="virtualContent">
+                        <canvas id="ekgCanvas"></canvas>
+                    </div>
+                </div>
+                
+                <div class="report-footer">
+                    Speed: 25 mm/sec &nbsp;|&nbsp; Limb: 10 mm/mV &nbsp;|&nbsp; 250 Hz &nbsp;|&nbsp; Multi-Lead ECG
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="settingsModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚙️ Gemini API Settings</h3>
+                <button class="close-btn" id="closeSettingsBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Enter your Google Gemini API Key to enable AI-powered EKG analysis.</p>
+                <input type="password" id="geminiKeyInput" placeholder="AIzaSy..." class="full-width-input" />
+                <p class="modal-hint">Your key is saved locally in your browser and never sent to our servers.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="saveKeyBtn" class="btn btn-primary">Save Key</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="aiModal" class="modal-overlay hidden">
+        <div class="modal-content ai-modal-content">
+            <div class="modal-header">
+                <h3>✨ Gemini AI EKG Analysis</h3>
+                <button class="close-btn" id="closeAiBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="aiReportContent">
+                <div class="loading-state hidden" id="aiLoading">
+                    <div class="spinner"></div>
+                    <p>Gemini is analyzing the visible EKG window...</p>
+                </div>
+                <div class="markdown-body" id="aiMarkdown"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SQL.js for parsing SQLite in Browser -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
