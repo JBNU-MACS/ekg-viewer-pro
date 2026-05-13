@@ -174,7 +174,7 @@ askGPTBtn.addEventListener('click', async () => {
                 'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: "gpt-5.5-pro",
+                model: "gpt-4o",
                 messages: [
                     {
                         role: "user",
