@@ -135,7 +135,14 @@ askAIBtn.addEventListener('click', async () => {
         
         const text = data.candidates[0].content.parts[0].text;
         aiLoading.classList.add('hidden');
-        aiMarkdown.innerHTML = marked.parse(text);
+        
+        const parsedMarkdown = marked.parse(text);
+        const imageHTML = `
+            <hr style="margin: 24px 0; border: 1px solid var(--border-color);">
+            <h4 style="margin-bottom: 12px; font-weight: 700;">📸 분석에 사용된 원본 이미지 (Visible Window)</h4>
+            <img src="data:image/jpeg;base64,${base64Image}" style="width: 100%; border-radius: 8px; border: 1px solid var(--border-color);">
+        `;
+        aiMarkdown.innerHTML = parsedMarkdown + imageHTML;
         
     } catch (e) {
         aiLoading.classList.add('hidden');
@@ -186,7 +193,14 @@ askGPTBtn.addEventListener('click', async () => {
         
         const text = data.choices[0].message.content;
         aiLoading.classList.add('hidden');
-        aiMarkdown.innerHTML = marked.parse(text);
+        
+        const parsedMarkdown = marked.parse(text);
+        const imageHTML = `
+            <hr style="margin: 24px 0; border: 1px solid var(--border-color);">
+            <h4 style="margin-bottom: 12px; font-weight: 700;">📸 분석에 사용된 원본 이미지 (Visible Window)</h4>
+            <img src="data:image/jpeg;base64,${base64Image}" style="width: 100%; border-radius: 8px; border: 1px solid var(--border-color);">
+        `;
+        aiMarkdown.innerHTML = parsedMarkdown + imageHTML;
         
     } catch (e) {
         aiLoading.classList.add('hidden');
