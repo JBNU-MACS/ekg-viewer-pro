@@ -99,7 +99,7 @@ saveKeyBtn.addEventListener('click', () => {
 });
 
 // Gemini AI Logic
-const promptKorean = "You are an expert cardiologist. Analyze this 6-lead ECG image. The leads shown from top to bottom are what the user selected. The grid is standard 10mm/mV and 25mm/s. Identify any arrhythmias, morphological abnormalities (like ST elevation, T wave inversion), or signs of ischemia. **답변은 반드시 한국어로 작성하고, 의학 용어를 적절히 섞어 전문적인 심장내과 소견서 형태로 출력해 줘.**";
+const promptKorean = "지시사항: 모든 진단 결과와 설명은 100% 한국어(Korean)로만 작성할 것.\n\nYou are an expert cardiologist. Analyze this 6-lead ECG image. The leads shown from top to bottom are what the user selected. The grid is standard 10mm/mV and 25mm/s. Identify any arrhythmias, morphological abnormalities (like ST elevation, T wave inversion), or signs of ischemia. **답변은 반드시 한국어로 작성하고, 의학 용어를 적절히 섞어 전문적인 심장내과 소견서 형태로 출력해 줘.**";
 
 askAIBtn.addEventListener('click', async () => {
     const apiKey = localStorage.getItem('geminiApiKey');
